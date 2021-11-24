@@ -27,14 +27,16 @@ async function getPokemonList() {
 
 }
 
-async function showPokemonList() {
+async function showPokemonList(filterBy) {
 
     let initialDiv = '<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">';
     let finalDiv = '</div>';
 
     let pokemonColumns = '';
 
-    for (let pokemon of pokemonList) {
+    let filteredList =  filterBy ? pokemonList.filter((poke) => poke.name.toUpperCase().includes(filterBy.toUpperCase())): pokemonList;
+
+    for (let pokemon of filteredList) {
 
         pokemonColumns +=
             `
@@ -53,7 +55,8 @@ async function showPokemonList() {
                 `;
     }
 
-    document.body.innerHTML += (initialDiv + pokemonColumns + finalDiv);
+    let pokemonListDiv = document.getElementById('pokemonList');
+    pokemonListDiv.innerHTML = (initialDiv + pokemonColumns + finalDiv);
 }
 
 async function showPokemonInfo(pokemonName, urlPokemonInfo) {
@@ -106,6 +109,25 @@ async function main() {
     await getPokemonList();
 }
 
+async function search(){
+    let pokemonListDiv = document.getElementById('pokemonList');
+    let searchInput = document.getElementById('searchInput');
+    pokemonListDiv.innerHTML ='';
+    
+    await showPokemonList(searchInput.value);
+}
+
+
+// https://www.freecodecamp.org/news/javascript-debounce-example/
+
+function debounce(func, timeout = 300){
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+  }
+  const processChange = debounce(async () => search());
 main();
 
 
